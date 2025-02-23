@@ -11,7 +11,7 @@ const UpdateProduct = () => {
 
   const getProductDetails = useCallback(async () => {
     try {
-      let result = await fetch(`https://ecommerce-backend-9i1m.onrender.com/products/${params.id}`);
+      let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/products/${params.id}`);
       result = await result.json();
       setName(result.name);
       setPrice(result.price);
@@ -28,7 +28,7 @@ const UpdateProduct = () => {
 
   const updateProduct = async () => {
     try {
-      let result = await fetch(`https://ecommerce-backend-9i1m.onrender.com/products/${params.id}`, {
+      let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/products/${params.id}`, {
         method: "PUT",
         body: JSON.stringify({ name, price, company, category }),
         headers: {

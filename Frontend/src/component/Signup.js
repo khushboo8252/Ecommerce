@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 const Signup = () => {
   const [name, setName] = useState("");
-  const [email, setemail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -12,25 +13,22 @@ const Signup = () => {
     if (auth) {
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate]); // ✅ Added 'navigate' to the dependency array
 
   const collectData = async () => {
     console.warn(name, email, password);
     const body = { name, email, password };
-    let result;
-    await axios
-      .post("https://ecommerce-backend-9i1m.onrender.com/register", body)
-      .then((res) => {
-        result = res.data;
-      })
-      .catch((err) => {
-        alert(err)
-      });
 
-    // console.warn(result);
-    localStorage.setItem("user", JSON.stringify(result.result));
-    localStorage.setItem("token", JSON.stringify(result.auth));
-    navigate("/");
+    try {
+      const res = await axios.post("https://backend-ecommerce-1-9a0z.onrender.com/register", body);
+      const result = res.data;
+
+      localStorage.setItem("user", JSON.stringify(result.result));
+      localStorage.setItem("token", JSON.stringify(result.auth));
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -43,15 +41,13 @@ const Signup = () => {
         onChange={(e) => setName(e.target.value)}
         placeholder="Enter Name"
       />
-
       <input
         className="inputbox"
         type="text"
         value={email}
-        onChange={(e) => setemail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter Email"
       />
-
       <input
         className="inputbox"
         type="password"
@@ -65,4 +61,5 @@ const Signup = () => {
     </div>
   );
 };
+
 export default Signup;

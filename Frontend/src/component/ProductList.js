@@ -7,13 +7,13 @@ const ProductList = () => {
     getProducts();
   }, []);
   const getProducts = async () => {
-    let result = await fetch("https://ecommerce-backend-9i1m.onrender.com/products");
+    let result = await fetch("https://backend-ecommerce-1-9a0z.onrender.com/products");
     result = await result.json();
     setProducts(result);
   };
   const deleteProduct = async (id) => {
     console.warn(id);
-    let result = await fetch(`https://ecommerce-backend-9i1m.onrender.com/products/${id}`, {
+    let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/products/${id}`, {
       method: "Delete",
     });
     result = await result.json();
@@ -24,7 +24,7 @@ const ProductList = () => {
   const searchHandle = async (e) => {
     let key = e.target.value;
     if (key) {
-      let result = await fetch(`https://ecommerce-backend-9i1m.onrender.com/search/${key}`);
+      let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/search/${key}`);
       result = await result.json();
       if (result) {
         setProducts(result);

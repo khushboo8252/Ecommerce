@@ -20,7 +20,7 @@ const AddProduct = () => {
     const items = { name, price, category, company, userId };
     let result;
     await axios
-      .post("https://ecommerce-backend-9i1m.onrender.com/add-product", items)
+      .post("https://backend-ecommerce-1-9a0z.onrender.com/add-product", items)
       .then((res) => {
         result = res.data;
         alert("added succcesfully");
