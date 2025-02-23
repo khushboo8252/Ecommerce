@@ -9,7 +9,7 @@ const Login = () => {
     if (auth) {
       navigate("/");
     }
-  },[]);
+  },[navigate]);
   const handleLogin = async () => {
     console.warn("email, password", email, password);
     let result = await fetch("https://ecommerce-backend-9i1m.onrender.com/login", {
