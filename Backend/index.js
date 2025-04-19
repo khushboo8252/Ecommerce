@@ -1,134 +1,116 @@
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 require("./db/config");
+
 const User = require("./db/User");
 const Product = require("./db/Product");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 const app = express();
-const bcrypt = require('bcrypt');
-const Jwt = require("jsonwebtoken");
-const jwtKey = "e-comm";
+const jwtKey = process.env.JWT_SECRET || "e-comm"; // use env variable in production
+
 app.use(express.json());
 app.use(cors());
- // Registration
-app.post("/register", async (req, resp) => {
+
+// ======== User Registration ========
+app.post("/register", async (req, res) => {
   try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      resp.status(409).send("User already exists");
-      return;
-    }
+    const { email, password, name } = req.body;
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10); // 10 is the salt rounds
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(409).send("User already exists");
 
-    let user = new User({
-      email: req.body.email,
-      password: hashedPassword,
-      name:req.body.name,
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ email, name, password: hashedPassword });
     let result = await user.save();
     result = result.toObject();
-    
+    delete result.password;
 
-    Jwt.sign({ result }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-      if (err) {
-        resp.status(500).send({
-          result: "Something went wrong. Please try again later.",
-        });
-      }
-      resp.send({ result, auth: token });
+    jwt.sign({ id: result._id }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+      if (err) return res.status(500).send({ result: "Token error" });
+      res.send({ result, auth: token });
     });
-  } catch (error) {
-    resp.status(500).send("Internal Server Error");
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
   }
 });
 
-
-// login
-app.post("/login", async (req, resp) => {
+// ======== User Login ========
+app.post("/login", async (req, res) => {
   try {
-    if (req.body.password && req.body.email) {
-      const user = await User.findOne({ email: req.body.email });
-      if (user) {
-        // Compare the provided password with the stored hashed password
-        const passwordMatch = await bcrypt.compare(req.body.password, user.password);
-        
-        if (passwordMatch) {
-          const userWithoutPassword = { ...user.toObject() };
-          delete userWithoutPassword.password;
+    const { email, password } = req.body;
 
-          Jwt.sign({ user: userWithoutPassword }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-            if (err) {
-              resp.status(500).send({
-                result: "Something went wrong. Please try again later.",
-              });
-            }
-            resp.send({ user: userWithoutPassword, auth: token });
-          });
-        } else {
-          resp.status(401).send({ result: "Invalid password" });
-        }
-      } else {
-        resp.status(404).send({ result: "No user found" });
-      }
-    } else {
-      resp.status(400).send({ result: "Invalid credentials" });
-    }
-  } catch (error) {
-    resp.status(500).send("Internal Server Error");
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).send({ result: "No user found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).send({ result: "Invalid password" });
+
+    const userWithoutPass = user.toObject();
+    delete userWithoutPass.password;
+
+    jwt.sign({ id: user._id }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+      if (err) return res.status(500).send({ result: "Token error" });
+      res.send({ user: userWithoutPass, auth: token });
+    });
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
   }
 });
 
-// add product
-app.post("/add-product", async (req, resp) => {
-  let product = new Product(req.body);
-  let result = await product.save();
-  resp.send(result);
-});
-
-// product list
-app.get("/products", async (req, resp) => {
-  let products = await Product.find();
-  if (products.length > 0) {
-    resp.send(products);
-  } else {
-    resp.send({ result: "No product found" });
+// ======== Add Product ========
+app.post("/add-product", async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    const result = await product.save();
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error adding product");
   }
 });
-//  to delete product
-app.delete("/products/:id", async (req, resp) => {
+
+// ======== Get All Products ========
+app.get("/products", async (req, res) => {
+  const products = await Product.find();
+  res.send(products.length ? products : { result: "No product found" });
+});
+
+// ======== Delete Product ========
+app.delete("/products/:id", async (req, res) => {
   const result = await Product.deleteOne({ _id: req.params.id });
-  resp.send(result);
+  res.send(result);
 });
 
-// update
-app.get("/products/:id", async (req, resp) => {
-  let result = await Product.findOne({ _id: req.params.id });
-  if (result) {
-    resp.send(result);
-  } else {
-    resp.send({ result: "No record found." });
-  }
-});
-// update
-app.put("/products/:id", async (req, resp) => {
-  let result = await Product.updateOne(
-    { _id: req.params.id },
-    { $set: req.body }
-  );
-  resp.send(result);
+// ======== Get Product By ID (for update) ========
+app.get("/products/:id", async (req, res) => {
+  const result = await Product.findOne({ _id: req.params.id });
+  res.send(result || { result: "No record found." });
 });
 
-// search product
-app.get("/search/:key", async (req, resp) => {
-  let result = await Product.find({
+// ======== Update Product ========
+app.put("/products/:id", async (req, res) => {
+  const result = await Product.updateOne({ _id: req.params.id }, { $set: req.body });
+  res.send(result);
+});
+
+// ======== Search Products ========
+app.get("/search/:key", async (req, res) => {
+  const result = await Product.find({
     $or: [
-      { name: { $regex: req.params.key } },
-      { price: { $regex: req.params.key } },
-      { category: { $regex: req.params.key } },
-      { company: { $regex: req.params.key } },
+      { name: { $regex: req.params.key, $options: "i" } },
+      { price: { $regex: req.params.key, $options: "i" } },
+      { category: { $regex: req.params.key, $options: "i" } },
+      { company: { $regex: req.params.key, $options: "i" } },
     ],
   });
-  resp.send(result);
+  res.send(result);
 });
-app.listen(5001);
+
+// ======== Start Server ========
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
