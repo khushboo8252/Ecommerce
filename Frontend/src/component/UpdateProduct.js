@@ -11,8 +11,8 @@ const UpdateProduct = () => {
 
   const getProductDetails = useCallback(async () => {
     try {
-      let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/products/${params.id}`);
-      result = await result.json();
+      const response = await fetch(`https://dashboard-backend-argl.onrender.com/products/${params.id}`);
+      const result = await response.json();
       setName(result.name);
       setPrice(result.price);
       setCategory(result.category);
@@ -20,23 +20,22 @@ const UpdateProduct = () => {
     } catch (error) {
       console.error("Failed to fetch product details", error);
     }
-  }, [params.id]); // ✅ Now safely included in the dependency array
+  }, [params.id]);
 
   useEffect(() => {
     getProductDetails();
-  }, [getProductDetails]); // ✅ Now follows React hooks best practices
+  }, [getProductDetails]);
 
   const updateProduct = async () => {
     try {
-      let result = await fetch(`https://backend-ecommerce-1-9a0z.onrender.com/products/${params.id}`, {
+      const response = await fetch(`https://dashboard-backend-argl.onrender.com/products/${params.id}`, {
         method: "PUT",
-        body: JSON.stringify({ name, price, company, category }),
+        body: JSON.stringify({ name, price, category, company }),
         headers: {
           "Content-Type": "application/json",
         },
       });
-      result = await result.json();
-      console.warn(result);
+      await response.json();
       navigate("/");
     } catch (error) {
       console.error("Failed to update product", error);
@@ -44,39 +43,51 @@ const UpdateProduct = () => {
   };
 
   return (
-    <div className="product">
-      <h1>Update Product</h1>
-      <input
-        type="text"
-        placeholder="Enter product name"
-        className="inputbox"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Enter product price"
-        className="inputbox"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Enter product category"
-        className="inputbox"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Enter product company"
-        className="inputbox"
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
-      />
-      <button onClick={updateProduct} className="appbutton">
-        Update Product
-      </button>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white w-full max-w-lg p-8 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          Update Product
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Enter product name"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter product price"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter product category"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter product company"
+          className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+        />
+
+        <button
+          onClick={updateProduct}
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+        >
+          Update Product
+        </button>
+      </div>
     </div>
   );
 };

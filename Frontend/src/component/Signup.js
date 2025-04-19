@@ -13,51 +13,67 @@ const Signup = () => {
     if (auth) {
       navigate("/");
     }
-  }, [navigate]); // ✅ Added 'navigate' to the dependency array
+  }, [navigate]);
 
   const collectData = async () => {
-    console.warn(name, email, password);
     const body = { name, email, password };
 
     try {
-      const res = await axios.post("https://backend-ecommerce-1-9a0z.onrender.com/register", body);
+      const res = await axios.post("https://dashboard-backend-argl.onrender.com/register", body);
       const result = res.data;
 
       localStorage.setItem("user", JSON.stringify(result.result));
       localStorage.setItem("token", JSON.stringify(result.auth));
-      navigate("/");
+
+      // Show success message
+      window.alert("Signup successful!");
+
+      // Redirect to the login page after user clicks OK
+      navigate("/login");
     } catch (err) {
       alert(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="register">
-      <h1>Register</h1>
-      <input
-        className="inputbox"
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Enter Name"
-      />
-      <input
-        className="inputbox"
-        type="text"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter Email"
-      />
-      <input
-        className="inputbox"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter Password"
-      />
-      <button onClick={collectData} className="appbutton" type="button">
-        Sign Up
-      </button>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          Sign Up
+        </h2>
+
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter Name"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <input
+          type="text"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter Email"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter Password"
+          className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          onClick={collectData}
+          type="button"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+        >
+          Sign Up
+        </button>
+      </div>
     </div>
   );
 };
