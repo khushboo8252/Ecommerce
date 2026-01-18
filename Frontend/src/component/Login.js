@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("https://dashboard-backend-argl.onrender.com/login", {
+      const res = await fetch("https://backend-dashboard-fxfe.onrender.com/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: {
