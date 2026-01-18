@@ -19,7 +19,7 @@ const Signup = () => {
     const body = { name, email, password };
 
     try {
-      const res = await axios.post("https://dashboard-backend-argl.onrender.com/register", body);
+      const res = await axios.post("https://backend-dashboard-fxfe.onrender.com/register", body);
       const result = res.data;
 
       localStorage.setItem("user", JSON.stringify(result.result));
