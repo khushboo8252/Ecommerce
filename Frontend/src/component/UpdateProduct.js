@@ -11,7 +11,7 @@ const UpdateProduct = () => {
 
   const getProductDetails = useCallback(async () => {
     try {
-      const response = await fetch(`https://dashboard-backend-argl.onrender.com/products/${params.id}`);
+      const response = await fetch(`https://backend-dashboard-fxfe.onrender.com/products/${params.id}`);
       const result = await response.json();
       setName(result.name);
       setPrice(result.price);
@@ -28,7 +28,7 @@ const UpdateProduct = () => {
 
   const updateProduct = async () => {
     try {
-      const response = await fetch(`https://dashboard-backend-argl.onrender.com/products/${params.id}`, {
+      const response = await fetch(`https://backend-dashboard-fxfe.onrender.com/products/${params.id}`, {
         method: "PUT",
         body: JSON.stringify({ name, price, category, company }),
         headers: {
