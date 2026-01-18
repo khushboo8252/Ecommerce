@@ -9,13 +9,13 @@ const ProductList = () => {
   }, []);
 
   const getProducts = async () => {
-    let result = await fetch("https://dashboard-backend-argl.onrender.com/products"); // Correct the URL to match the backend port (5001)
+    let result = await fetch("https://backend-dashboard-fxfe.onrender.com/products"); // Correct the URL to match the backend port (5001)
     result = await result.json();
     setProducts(result);
   };
 
   const deleteProduct = async (id) => {
-    let result = await fetch(`https://dashboard-backend-argl.onrender.com/products/${id}`, { // Correct the URL to match the backend port (5001)
+    let result = await fetch(`https://backend-dashboard-fxfe.onrender.com/products/${id}`, { // Correct the URL to match the backend port (5001)
       method: "DELETE",
     });
     result = await result.json();
@@ -27,7 +27,7 @@ const ProductList = () => {
   const searchHandle = async (e) => {
     let key = e.target.value;
     if (key) {
-      let result = await fetch(`https://dashboard-backend-argl.onrender.com/search/${key}`); // Correct the URL to match the backend port (5001)
+      let result = await fetch(`https://backend-dashboard-fxfe.onrender.com/search/${key}`); // Correct the URL to match the backend port (5001)
       result = await result.json();
       if (result) {
         setProducts(result);
