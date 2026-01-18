@@ -27,7 +27,7 @@ const productData = { name, price, category, company, userId };
 
 try {
   // Send POST request
-  const response = await axios.post("https://dashboard-backend-argl.onrender.com/add-product", productData);
+  const response = await axios.post("https://backend-dashboard-fxfe.onrender.com/add-product", productData);
 
   // Check if response is successful and use it (e.g., logging or handling response data)
   if (response.status === 200) {
